@@ -1,4 +1,4 @@
-# 🤟 Detector de Lenguaje de Señas - PROYECTO SENATI
+# 🤟 Detector de Lenguaje de Señas
 
 <div align="center">
 
@@ -6,27 +6,33 @@
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-0.10-0097A7?style=for-the-badge&logo=google&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.10-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-1.26-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![Gunicorn](https://img.shields.io/badge/Gunicorn-22.0-499848?style=for-the-badge&logo=gunicorn&logoColor=white)
 
-**Reconocimiento de letras del abecedario en lenguaje de señas usando visión por computadora, directamente desde el navegador.**
+<br/>
+
+> Aplicación web que detecta en tiempo real letras del abecedario en lenguaje de señas usando la cámara del navegador y visión por computadora.
 
 </div>
 
 ---
 
-## ¿Qué es este proyecto?
+## 📌 ¿Qué es?
 
-Es una aplicación web que usa la cámara del dispositivo para detectar en tiempo real las letras del abecedario expresadas en lenguaje de señas. El usuario abre la app en el navegador, presiona Iniciar, y el sistema identifica qué letra está haciendo con la mano.
+Es una app web donde el usuario abre el navegador, activa la cámara y el sistema detecta automáticamente qué letra del abecedario está haciendo con la mano. La detección ocurre en tiempo real, frame por frame, sin necesidad de instalar ningún software adicional.
 
-No requiere instalar nada extra más allá de las dependencias de Python. Funciona desde cualquier navegador moderno con cámara.
+El proyecto combina dos tecnologías clave:
+- **MediaPipe** (Google) para detectar los puntos de la mano
+- **Geometría de ángulos** para interpretar la posición de los dedos
 
 ---
 
-## ¿Para qué sirve?
+## 🎯 ¿Para qué sirve?
 
-- Como herramienta de aprendizaje del lenguaje de señas
-- Para practicar el abecedario y recibir retroalimentación visual inmediata
-- Como base para proyectos más avanzados de comunicación inclusiva
-- Como demostración de visión por computadora aplicada
+- Aprender y practicar el abecedario en lenguaje de señas
+- Recibir retroalimentación visual inmediata al hacer una seña
+- Construir palabras letra por letra usando solo la mano
+- Demostración práctica de visión por computadora aplicada a la inclusión
 
 ---
 
@@ -35,154 +41,273 @@ No requiere instalar nada extra más allá de las dependencias de Python. Funcio
 ```
 señas/
 │
-├── app.py                  # Servidor Flask — rutas y lógica principal
-├── sign_detector.py        # Motor de detección — ángulos + MediaPipe
-├── requirements.txt        # Dependencias de Python
-├── Procfile                # Comando de arranque para Railway
-├── runtime.txt             # Versión de Python para deploy
+├── app.py               → Servidor Flask: recibe frames, llama al detector, devuelve resultados
+├── sign_detector.py     → Motor de detección: MediaPipe + ángulos + fallback por landmarks
+├── requirements.txt     → Dependencias de Python
+├── Procfile             → Instrucción de arranque para Railway (producción)
+├── runtime.txt          → Versión de Python que usa el servidor en la nube
 │
 ├── templates/
-│   └── index.html          # Interfaz web completa
+│   └── index.html       → Toda la interfaz: detector, abecedario, sección de info
 │
 └── static/
     ├── css/
-    │   └── style.css       # Estilos y diseño
+    │   └── style.css    → Diseño visual completo (paleta azul marino + dorado)
     └── js/
-        └── app.js          # Lógica del frontend (cámara, envío de frames)
+        └── app.js       → Captura de cámara, envío de frames, actualización de UI
 ```
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
 
-| Tecnología | Versión | Para qué se usó |
+| Tecnología | Versión | Rol en el proyecto |
 |---|---|---|
 | **Python** | 3.11 | Lenguaje principal del backend |
-| **Flask** | 3.0 | Servidor web y API REST |
-| **MediaPipe** | 0.10 | Detección de 21 landmarks de la mano |
-| **OpenCV Headless** | 4.10 | Procesamiento de imágenes y anotación de frames |
-| **NumPy** | 1.26 | Cálculo de vectores y ángulos |
-| **Gunicorn** | 22.0 | Servidor WSGI para producción |
-| **HTML / CSS / JS** | — | Frontend sin frameworks adicionales |
+| **Flask** | 3.0 | Servidor web que expone la API REST |
+| **MediaPipe** | 0.10 | Detecta los 21 landmarks de la mano en cada frame |
+| **OpenCV Headless** | 4.10 | Decodifica imágenes y dibuja anotaciones sobre los frames |
+| **NumPy** | 1.26 | Operaciones vectoriales para el cálculo de ángulos |
+| **Gunicorn** | 22.0 | Servidor WSGI para correr en producción (Railway) |
+| **HTML / CSS / JS** | — | Frontend nativo, sin frameworks |
 
-> Se usa `opencv-python-headless` en lugar de `opencv-python` porque la versión headless no necesita librerías de pantalla (Qt, GTK), que no existen en servidores en la nube.
-
----
-
-## ⚙️ Cómo funciona — paso a paso
-
-### 1. El navegador captura la cámara
-
-```
-Navegador → getUserMedia API → stream de video local
-```
-
-Al presionar **Iniciar**, el navegador pide permiso para usar la cámara usando la API nativa `getUserMedia`. El video se renderiza en un elemento `<canvas>` invisible.
-
-Este enfoque permite que la app funcione desplegada en la nube, ya que el servidor no necesita acceso a ninguna cámara física.
+> **¿Por qué `opencv-python-headless`?** La versión estándar de OpenCV requiere librerías gráficas del sistema (Qt, GTK) para mostrar ventanas. En un servidor en la nube esas librerías no existen, así que se usa la versión `headless` que solo procesa imágenes sin necesidad de pantalla.
 
 ---
 
-### 2. Los frames se envían al servidor
+## ⚙️ Cómo funciona — flujo completo
 
 ```
-Canvas (frame actual) → JPEG base64 → POST /api/process_frame
+[Cámara del usuario]
+       ↓
+[Navegador captura frame con getUserMedia]
+       ↓
+[Frame → JPEG → base64 → POST /api/process_frame]
+       ↓
+[Servidor Flask recibe el frame]
+       ↓
+[OpenCV decodifica la imagen]
+       ↓
+[MediaPipe detecta 21 landmarks de la mano]
+       ↓
+[Se calculan ángulos por dedo → array de 6 bits]
+       ↓
+[Comparación con reglas del abecedario → letra]
+       ↓
+[OpenCV anota el frame con bounding box + letra]
+       ↓
+[Frame anotado → base64 → JSON de respuesta]
+       ↓
+[Navegador muestra el frame y la letra detectada]
 ```
-
-Cada frame del video se captura con `canvas.toDataURL('image/jpeg')`, se codifica en base64 y se manda al servidor Flask como JSON. Esto sucede en un loop continuo sincronizado con `requestAnimationFrame`.
 
 ---
 
-### 3. MediaPipe detecta la mano
+## 🔬 Detección en detalle
+
+### Los 21 landmarks de MediaPipe
+
+MediaPipe analiza cada frame e identifica 21 puntos clave de la mano, cada uno con coordenadas `x`, `y` normalizadas entre 0 y 1:
 
 ```
-Frame JPEG → OpenCV decode → MediaPipe → 21 landmarks
+         8   12  16  20        ← puntas de los dedos (TIP)
+         |   |   |   |
+         7   11  15  19        ← articulación distal (DIP)
+         |   |   |   |
+     4   6   10  14  18        ← articulación media (PIP)
+     |   5   9   13  17        ← base del dedo (MCP)
+     3   |
+     |   0  ← muñeca (WRIST)
+     2
+     |
+     1
 ```
 
-El servidor decodifica el frame, lo pasa por MediaPipe Hands que devuelve las coordenadas de **21 puntos clave** de la mano:
-
-```
-Punta del dedo, articulación media, base de cada dedo, muñeca...
-```
-
-<div align="center">
-
-```
-        8   12  16  20
-        |   |   |   |
-        7   11  15  19
-        |   |   |   |
-    4   6   10  14  18
-    |   5   9   13  17
-    3       |
-    |       0 (muñeca)
-    2
-    |
-    1
-```
-
-</div>
+Cada dedo usa 4 puntos: TIP, DIP, PIP y MCP. El pulgar tiene su propia lógica porque se mueve en otro eje.
 
 ---
 
-### 4. Se calculan los ángulos de cada dedo
+### Cálculo de ángulos (método principal)
+
+Para cada dedo se toman 3 puntos: la punta (TIP), la articulación media (PIP) y la base (MCP). Con esos 3 puntos se calcula el **ángulo en la articulación** usando la **ley del coseno**:
 
 ```python
-# Ley del coseno sobre los 3 puntos de cada dedo
-angle = degrees(acos((l1² + l3² - l2²) / (2 * l1 * l3)))
+def _angle_from_points(p1, p2, p3):
+    l1 = np.linalg.norm(p2 - p3)   # distancia p2-p3
+    l2 = np.linalg.norm(p1 - p3)   # distancia p1-p3
+    l3 = np.linalg.norm(p1 - p2)   # distancia p1-p2
+
+    num_den = (l1**2 + l3**2 - l2**2) / (2 * l1 * l3)
+    return round(degrees(abs(acos(num_den))))
 ```
 
-Con los landmarks se calcula el **ángulo en la articulación media** de cada dedo usando la ley del coseno. Esto determina si el dedo está extendido o doblado:
+El resultado es un ángulo en grados. La regla es simple:
 
-- Ángulo **> 90°** → dedo **extendido** → `1`
-- Ángulo **≤ 90°** → dedo **doblado** → `0`
+| Ángulo | Estado del dedo |
+|---|---|
+| **> 90°** | Extendido → `1` |
+| **≤ 90°** | Doblado → `0` |
 
-El resultado es un array de 6 bits:
+Esto se aplica a los 6 "dedos" (contando el pulgar doble) y genera el array de detección:
 
-```
-[pulgar_ext, pulgar_int, meñique, anular, medio, índice]
+```python
+dedos = [pulgar_ext, pulgar_int, meñique, anular, medio, índice]
+#         0 o 1       0 o 1      0 o 1    0 o 1   0 o 1   0 o 1
 ```
 
 ---
 
-### 5. El patrón se compara con el abecedario
+### Clasificación por patrones
+
+El array de 6 bits se compara directamente contra los patrones de cada letra:
 
 ```python
-if dedos == [1, 1, 0, 0, 0, 0]: return "A"
-if dedos == [0, 0, 0, 0, 0, 0]: return "E"
-if dedos == [0, 0, 1, 0, 0, 0]: return "I"
-if dedos == [1, 0, 1, 0, 0, 0]: return "O"
-if dedos == [0, 0, 1, 0, 0, 1]: return "U"
-# ... y así con todas las letras
-```
+def clasificar_por_angulos(dedos):
+    # Vocales
+    if dedos == [1, 1, 0, 0, 0, 0]: return "A"   # puño + pulgar al lado
+    if dedos == [0, 0, 0, 0, 0, 0]: return "E"   # todos los dedos doblados
+    if dedos == [0, 0, 1, 0, 0, 0]: return "I"   # solo meñique arriba
+    if dedos == [1, 0, 1, 0, 0, 0]: return "O"   # pulgar + meñique
+    if dedos == [0, 0, 1, 0, 0, 1]: return "U"   # meñique + índice
 
-Si no hay match en la clasificación por ángulos, se usa un **método fallback** basado en distancias y posiciones relativas entre landmarks para cubrir más letras.
+    # Consonantes
+    if dedos == [0, 0, 1, 1, 1, 1]: return "B"   # 4 dedos arriba
+    if dedos == [0, 0, 0, 0, 0, 1]: return "D"   # solo índice
+    if dedos == [1, 1, 0, 0, 1, 1]: return "K"   # índice + medio + pulgar
+    if dedos == [1, 1, 0, 0, 0, 1]: return "L"   # índice + pulgar (forma L)
+    if dedos == [1, 1, 1, 0, 0, 0]: return "Y"   # pulgar + meñique
+    # ... y más letras
+```
 
 ---
 
-### 6. Detección de movimiento (letra J)
+### Método fallback (landmarks normalizados)
 
-La letra J requiere movimiento del meñique. Se detecta así:
+Si el método de ángulos no encuentra match, se activa un segundo método que evalúa **distancias y posiciones relativas** entre landmarks. Este método cubre letras más complejas como C, G, H, R, S, T, X:
 
 ```python
-pinky_sum = pinky_coords[0] + pinky_coords[1]
-delta     = abs(pinky_sum - prev_sum)
+def finger_extended(lm, tip, dip, pip, mcp):
+    # El dedo está extendido si la punta está claramente por encima del PIP
+    return lm[tip].y < lm[pip].y - 0.025
 
+def touching(lm, a, b, threshold=0.055):
+    # Dos landmarks se "tocan" si están suficientemente cerca
+    return d(lm, a, b) < threshold
+
+# Ejemplo: letra F = índice+pulgar se tocan, los otros 3 extendidos
+if not IDX and MID and RNG and PNK:
+    if touching(lm, 4, 8, 0.06):
+        return "F"
+```
+
+---
+
+### Detección de movimiento — letra J
+
+La J no es una postura estática, requiere trazar una J en el aire con el meñique. Se detecta comparando la posición del meñique entre frames consecutivos:
+
+```python
+# Guardar posición anterior del meñique
+pinky_sum = pinky_coords[0] + pinky_coords[1]   # x + y del meñique
+delta     = abs(pinky_sum - prev_sum)            # cuánto se movió
+
+# Si el dedo índice está solo arriba Y el meñique se movió más de 30px → J
 if dedos == [0, 0, 1, 0, 0, 0] and delta > 30:
     sign = "J"
 ```
 
-Se guarda la posición del meñique en cada frame y si el desplazamiento supera 30 píxeles entre frames, se detecta como J.
+---
+
+### Anotación del frame
+
+Después de clasificar la seña, OpenCV dibuja sobre el frame antes de devolverlo:
+
+```python
+# Rectángulo alrededor de la mano
+cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
+
+# Etiqueta con la letra detectada
+cv2.putText(annotated, label, (x1 + 6, y1 - 6),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2)
+```
+
+El color del bounding box cambia según la letra: **naranja** para J (movimiento), **azul-violeta** para el resto.
 
 ---
 
-### 7. El frame anotado vuelve al navegador
+## 🖥️ El servidor Flask — `app.py`
 
-```
-Frame anotado (OpenCV) → JPEG → base64 → JSON → canvas del navegador
+Flask actúa como intermediario entre el navegador y el detector. El endpoint principal es:
+
+```python
+@app.route("/api/process_frame", methods=["POST"])
+def process_frame():
+    # 1. Recibir el frame en base64
+    img_data = request.get_json()["frame"]
+
+    # 2. Decodificar base64 → imagen numpy
+    img_bytes = base64.b64decode(img_data.split(",", 1)[1])
+    frame = cv2.imdecode(np.frombuffer(img_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
+
+    # 3. Procesar con MediaPipe
+    annotated, signs = detector.process_frame(frame)
+
+    # 4. Devolver frame anotado + letra detectada
+    _, buf = cv2.imencode(".jpg", annotated, [cv2.IMWRITE_JPEG_QUALITY, 75])
+    return jsonify({
+        "signs": signs,
+        "history": history[-10:],
+        "annotated_frame": base64.b64encode(buf).decode("utf-8")
+    })
 ```
 
-El servidor dibuja el bounding box y la letra sobre el frame con OpenCV, lo codifica en base64 y lo devuelve en la respuesta JSON. El navegador lo muestra en el `<canvas>` visible.
+### Rutas disponibles
+
+| Ruta | Método | Qué hace |
+|---|---|---|
+| `/` | GET | Devuelve la página principal |
+| `/api/process_frame` | POST | Recibe frame → devuelve letra + frame anotado |
+| `/api/clear_history` | GET/POST | Limpia el historial de señas |
+| `/api/status` | GET | Estado actual (historial) |
+| `/api/signs` | GET | Lista completa de señas soportadas |
+
+---
+
+## 🌐 El frontend — `app.js`
+
+El navegador maneja toda la captura de video sin depender del servidor:
+
+```javascript
+// 1. Pedir permiso y abrir la cámara
+mediaStream = await navigator.mediaDevices.getUserMedia({
+    video: { width: 640, height: 480, facingMode: 'user' },
+    audio: false
+});
+videoRaw.srcObject = mediaStream;
+
+// 2. Loop continuo: capturar frame → enviar → mostrar resultado
+async function sendFrame() {
+    // Dibujar frame actual en canvas oculto
+    captureCtx.drawImage(videoRaw, 0, 0);
+
+    // Codificar como JPEG base64
+    const frameB64 = captureCanvas.toDataURL('image/jpeg', 0.7);
+
+    // Enviar al servidor
+    const res  = await fetch('/api/process_frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ frame: frameB64 })
+    });
+
+    const data = await res.json();
+
+    // Mostrar el frame anotado que devolvió el servidor
+    const img = new Image();
+    img.onload = () => displayCtx.drawImage(img, 0, 0);
+    img.src = 'data:image/jpeg;base64,' + data.annotated_frame;
+}
+```
 
 ---
 
@@ -190,77 +315,54 @@ El servidor dibuja el bounding box y la letra sobre el frame con OpenCV, lo codi
 
 | Método | Letras |
 |---|---|
-| Por ángulos (principal) | A, E, I, O, U, B, D, F, K, L, N, P, V, W, Y |
-| Por landmarks (fallback) | C, G, H, M, Q, R, S, T, X, U, V |
-| Por movimiento | J |
+| Ángulos (principal) | `A` `E` `I` `O` `U` `B` `D` `F` `K` `L` `N` `P` `V` `W` `Y` |
+| Landmarks (fallback) | `C` `G` `H` `M` `Q` `R` `S` `T` `X` |
+| Movimiento | `J` |
+| Gestos extra | `✊` `👍` `✌️` `🤘` `✋` |
 
 ---
 
 ## 🚀 Correr en local
 
-**1. Clonar o descargar el proyecto**
-
 ```bash
-git clone <url-del-repo>
+# 1. Entrar a la carpeta del proyecto
 cd señas
-```
 
-**2. Instalar dependencias**
-
-```bash
+# 2. Instalar dependencias
 pip install -r requirements.txt
-```
 
-> Requiere **Python 3.8 – 3.11**. MediaPipe no soporta Python 3.12+.
-
-**3. Ejecutar**
-
-```bash
+# 3. Ejecutar
 python app.py
+
+# 4. Abrir en el navegador
+#    http://localhost:5000
 ```
 
-**4. Abrir en el navegador**
-
-```
-http://localhost:5000
-```
+> Requiere **Python 3.8 – 3.11**. MediaPipe aún no es compatible con Python 3.12+.
 
 ---
 
 ## ☁️ Deploy en Railway
 
-Railway es una plataforma en la nube que permite desplegar el proyecto para que funcione desde cualquier dispositivo sin correrlo local.
+Railway es una plataforma en la nube que permite publicar el proyecto con una URL pública, accesible desde cualquier dispositivo con internet.
 
 **Pasos:**
 
-1. Subir la carpeta `señas/` a un repositorio de **GitHub**
-2. Entrar a [railway.app](https://railway.app) y crear una cuenta gratuita
-3. Nuevo proyecto → **Deploy from GitHub repo**
-4. Seleccionar el repositorio
-5. Railway detecta el `Procfile` automáticamente y despliega
-6. En pocos minutos genera una URL pública: `https://tuapp.railway.app`
+1. Subir el proyecto a un repositorio de **GitHub**
+2. Ir a [railway.app](https://railway.app) → crear cuenta gratuita
+3. **New Project** → Deploy from GitHub repo
+4. Seleccionar el repositorio → Railway detecta el `Procfile` automáticamente
+5. En 2-3 minutos genera una URL pública tipo `https://tuapp.railway.app`
 
-> El plan gratuito incluye **500 horas/mes**, suficiente para uso normal.
+**Archivos de configuración incluidos:**
 
-**Archivos necesarios para el deploy** (ya incluidos):
+| Archivo | Para qué sirve |
+|---|---|
+| `Procfile` | Le dice a Railway cómo arrancar: `gunicorn app:app` |
+| `runtime.txt` | Especifica `python-3.11.9` para el entorno de build |
+| `requirements.txt` | Railway instala todas las dependencias automáticamente |
 
-```
-Procfile      → le dice a Railway cómo arrancar la app
-runtime.txt   → especifica la versión de Python
-requirements.txt → instala las dependencias automáticamente
-```
-
----
-
-## 🖥️ API del servidor
-
-| Ruta | Método | Descripción |
-|---|---|---|
-| `/` | GET | Página principal |
-| `/api/process_frame` | POST | Recibe frame en base64, devuelve letra + frame anotado |
-| `/api/clear_history` | GET/POST | Limpia el historial de señas |
-| `/api/status` | GET | Estado actual del servidor |
-| `/api/signs` | GET | Lista de todas las señas soportadas |
+> El plan gratuito incluye **500 horas/mes**, más que suficiente para un proyecto de uso normal.
 
 ---
 
