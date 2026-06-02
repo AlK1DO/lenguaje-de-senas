@@ -53,19 +53,19 @@ startBtn.addEventListener('click', async () => {
 
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480, facingMode: 'user' },
+      video: { width: 320, height: 240, facingMode: 'user' },
       audio: false,
     });
 
     videoRaw.srcObject = mediaStream;
     await videoRaw.play();
 
-    // Ajustar canvas al tamaño real del video
-    const { videoWidth: vw, videoHeight: vh } = videoRaw;
-    captureCanvas.width  = vw || 640;
-    captureCanvas.height = vh || 480;
-    displayCanvas.width  = vw || 640;
-    displayCanvas.height = vh || 480;
+    // Canvas de captura pequeño (para enviar al servidor rápido)
+    captureCanvas.width  = 320;
+    captureCanvas.height = 240;
+    // Canvas visible más grande (para que se vea bien)
+    displayCanvas.width  = 640;
+    displayCanvas.height = 480;
 
     videoPlaceholder.classList.add('hidden');
     displayCanvas.classList.remove('hidden');
@@ -76,7 +76,9 @@ startBtn.addEventListener('click', async () => {
     loopActive = true;
     frameCount = 0;
     fpsTimer   = Date.now();
-    processLoop();
+    lastAnnotated = null;
+    drawLocalVideo();  // video fluido local
+    processLoop();     // detección en paralelo
 
   } catch (err) {
     console.error(err);
@@ -104,23 +106,35 @@ function stopCamera() {
   setStatus('idle', 'Listo');
   clearDetection();
   lastSigns = [];
+  lastAnnotated = null;
 }
 
 // ── Loop de procesamiento ───────────────────────────────────────────────────
-// Captura un frame, lo manda al servidor y muestra el resultado anotado.
-// Usa recursión con requestAnimationFrame para no saturar el servidor.
+// El video local se muestra directo en displayCanvas para que se vea fluido.
+// El servidor procesa en paralelo y solo actualiza las anotaciones encima.
 let processing = false;
+let lastAnnotated = null;
+
+function drawLocalVideo() {
+  if (!loopActive) return;
+  // Dibujar el video local directo (fluido, sin latencia)
+  displayCtx.drawImage(videoRaw, 0, 0, displayCanvas.width, displayCanvas.height);
+  // Si hay frame anotado del servidor, dibujarlo encima
+  if (lastAnnotated) {
+    displayCtx.drawImage(lastAnnotated, 0, 0, displayCanvas.width, displayCanvas.height);
+  }
+  requestAnimationFrame(drawLocalVideo);
+}
 
 async function processLoop() {
   if (!loopActive) return;
-
   if (!processing) {
     processing = true;
     await sendFrame();
     processing = false;
   }
-
-  requestAnimationFrame(processLoop);
+  // Esperar un poco antes del siguiente frame para no saturar el servidor
+  setTimeout(() => { if (loopActive) processLoop(); }, 50);
 }
 
 async function sendFrame() {
@@ -129,8 +143,8 @@ async function sendFrame() {
   // Dibujar frame en canvas oculto
   captureCtx.drawImage(videoRaw, 0, 0, captureCanvas.width, captureCanvas.height);
 
-  // Codificar como JPEG base64
-  const frameB64 = captureCanvas.toDataURL('image/jpeg', 0.7);
+  // Codificar como JPEG base64 (calidad baja = más rápido)
+  const frameB64 = captureCanvas.toDataURL('image/jpeg', 0.4);
 
   try {
     const res = await fetch('/api/process_frame', {
@@ -143,10 +157,10 @@ async function sendFrame() {
 
     const data = await res.json();
 
-    // Mostrar frame anotado en el canvas visible
+    // Guardar frame anotado para superponerlo al video local
     if (data.annotated_frame) {
       const img = new Image();
-      img.onload = () => displayCtx.drawImage(img, 0, 0);
+      img.onload = () => { lastAnnotated = img; };
       img.src = 'data:image/jpeg;base64,' + data.annotated_frame;
     }
 
