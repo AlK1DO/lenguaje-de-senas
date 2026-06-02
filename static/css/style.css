@@ -2,28 +2,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Paleta */
-  --ink:        #0c0c10;
-  --ink-2:      #13131a;
-  --ink-3:      #1c1c28;
-  --ink-4:      #252535;
-  --line:       rgba(255,255,255,0.06);
-  --line-hi:    rgba(255,255,255,0.12);
+  /* Paleta — Azul marino + Dorado */
+  --ink:        #050d1a;
+  --ink-2:      #0a1628;
+  --ink-3:      #0f2040;
+  --ink-4:      #163058;
+  --line:       rgba(255,255,255,0.07);
+  --line-hi:    rgba(212,175,55,0.2);
 
-  --lime:       #c8f135;
-  --lime-dim:   rgba(200,241,53,0.12);
-  --lime-glow:  rgba(200,241,53,0.25);
+  --gold:       #d4af37;
+  --gold-dim:   rgba(212,175,55,0.12);
+  --gold-glow:  rgba(212,175,55,0.3);
+  --gold-light: #f0d060;
 
-  --violet:     #7c6af7;
-  --violet-dim: rgba(124,106,247,0.12);
-  --violet-glow:rgba(124,106,247,0.3);
+  --navy:       #1a3a6b;
+  --navy-light: #2a5298;
 
-  --cyan:       #38e8d8;
-  --orange:     #ff7a45;
+  --cyan:       #5bb8f5;
+  --orange:     #e8834a;
 
-  --text:       #e8e8f0;
-  --text-2:     #9898b0;
-  --text-3:     #5a5a72;
+  --text:       #eef2f8;
+  --text-2:     #8a9bbf;
+  --text-3:     #4a5a7a;
 
   --r:          12px;
   --r-sm:       8px;
@@ -60,20 +60,20 @@ html, body {
 .orb-1 {
   width: 600px; height: 600px;
   top: -200px; left: -150px;
-  background: radial-gradient(circle, rgba(124,106,247,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(26,58,107,0.6) 0%, transparent 70%);
   animation: orbFloat 18s ease-in-out infinite alternate;
 }
 .orb-2 {
   width: 500px; height: 500px;
   bottom: -150px; right: -100px;
-  background: radial-gradient(circle, rgba(200,241,53,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 70%);
   animation: orbFloat 22s ease-in-out infinite alternate-reverse;
 }
 .orb-3 {
   width: 300px; height: 300px;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(56,232,216,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(42,82,152,0.25) 0%, transparent 70%);
   animation: orbFloat 14s ease-in-out infinite alternate;
 }
 
@@ -109,7 +109,7 @@ html, body {
 .brand-name {
   display: block;
   font-size: 22px; font-weight: 700; letter-spacing: -0.03em;
-  color: var(--lime);
+  color: var(--gold);
   font-family: var(--mono);
   line-height: 1;
 }
@@ -136,7 +136,7 @@ html, body {
 }
 .nav-pill:hover { color: var(--text); }
 .nav-pill.active {
-  background: var(--lime);
+  background: var(--gold);
   color: var(--ink);
   font-weight: 700;
 }
@@ -152,8 +152,8 @@ html, body {
   display: inline-block;
 }
 .status-indicator.streaming {
-  background: var(--lime);
-  box-shadow: 0 0 10px var(--lime-glow);
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
   animation: blink 1.5s ease-in-out infinite;
 }
 .status-indicator.error { background: var(--orange); }
@@ -186,11 +186,11 @@ html, body {
 .hero-sign-char {
   font-family: var(--mono);
   font-size: 56px; font-weight: 700;
-  color: var(--lime);
+  color: var(--gold);
   position: relative; z-index: 2;
   transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
   display: block;
-  text-shadow: 0 0 30px var(--lime-glow);
+  text-shadow: 0 0 30px var(--gold-glow);
 }
 .hero-sign.pop .hero-sign-char {
   animation: charPop 0.35s cubic-bezier(0.34,1.56,0.64,1);
@@ -203,12 +203,12 @@ html, body {
 
 .hero-sign-ring {
   position: absolute; inset: 0; border-radius: 50%;
-  border: 1.5px solid rgba(200,241,53,0.2);
+  border: 1.5px solid rgba(212,175,55,0.25);
   animation: ringPulse 3s ease-in-out infinite;
 }
 .ring-2 {
   inset: -12px;
-  border-color: rgba(200,241,53,0.08);
+  border-color: rgba(212,175,55,0.08);
   animation-delay: 0.5s;
 }
 @keyframes ringPulse {
@@ -263,12 +263,12 @@ html, body {
 .btn-start svg, .btn-stop svg { width: 15px; height: 15px; }
 
 .btn-start {
-  background: var(--lime); color: var(--ink);
-  box-shadow: 0 0 24px var(--lime-glow);
+  background: var(--gold); color: var(--ink);
+  box-shadow: 0 0 24px var(--gold-glow);
 }
 .btn-start:hover {
-  background: #d4f84a;
-  box-shadow: 0 0 36px var(--lime-glow);
+  background: var(--gold-light);
+  box-shadow: 0 0 36px var(--gold-glow);
   transform: translateY(-1px);
 }
 
@@ -291,8 +291,8 @@ html, body {
 /* Esquinas decorativas */
 .cam-corner {
   position: absolute; width: 20px; height: 20px;
-  border-color: var(--lime); border-style: solid;
-  opacity: 0.5; z-index: 3;
+  border-color: var(--gold); border-style: solid;
+  opacity: 0.6; z-index: 3;
 }
 .cam-corner.tl { top: 12px; left: 12px;  border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
 .cam-corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
@@ -316,7 +316,7 @@ html, body {
 }
 .cam-icon svg { width: 26px; height: 26px; }
 .cam-placeholder-inner p { font-size: 13px; color: var(--text-2); }
-.cam-placeholder-inner strong { color: var(--lime); }
+.cam-placeholder-inner strong { color: var(--gold); }
 .cam-hint { font-size: 11px; color: var(--text-3); }
 
 .cam-feed {
@@ -344,8 +344,8 @@ html, body {
   transition: all 0.3s ease;
 }
 .live-dot.active {
-  background: var(--lime);
-  box-shadow: 0 0 8px var(--lime-glow);
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
   animation: blink 1s ease-in-out infinite;
 }
 
@@ -359,12 +359,12 @@ html, body {
 
 .chip {
   display: inline-flex; align-items: center;
-  background: var(--lime-dim);
-  border: 1px solid rgba(200,241,53,0.3);
+  background: var(--gold-dim);
+  border: 1px solid rgba(212,175,55,0.35);
   border-radius: 99px;
   padding: 6px 18px;
   font-size: 20px; font-weight: 700;
-  color: var(--lime);
+  color: var(--gold);
   font-family: var(--mono);
   animation: chipIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
@@ -411,8 +411,7 @@ html, body {
 .history-sign {
   font-family: var(--mono); font-size: 16px; font-weight: 700;
   color: var(--cyan);
-}
-.history-time { font-size: 11px; color: var(--text-3); }
+}.history-time { font-size: 11px; color: var(--text-3); }
 
 /* Palabra */
 .word-display {
@@ -431,15 +430,15 @@ html, body {
 .btn-add-letter {
   width: 100%; padding: 9px;
   border-radius: var(--r-sm);
-  border: 1px dashed rgba(200,241,53,0.3);
-  background: var(--lime-dim);
-  color: var(--lime); cursor: pointer;
+  border: 1px dashed rgba(212,175,55,0.35);
+  background: var(--gold-dim);
+  color: var(--gold); cursor: pointer;
   font-family: var(--font); font-size: 12px; font-weight: 600;
   transition: all 0.2s ease;
 }
 .btn-add-letter:hover:not(:disabled) {
-  background: rgba(200,241,53,0.2);
-  border-color: rgba(200,241,53,0.5);
+  background: rgba(212,175,55,0.2);
+  border-color: rgba(212,175,55,0.5);
 }
 .btn-add-letter:disabled { opacity: 0.35; cursor: not-allowed; }
 
@@ -463,9 +462,9 @@ html, body {
 }
 .filter-btn:hover { border-color: var(--line-hi); color: var(--text); }
 .filter-btn.active {
-  background: var(--lime-dim);
-  border-color: rgba(200,241,53,0.4);
-  color: var(--lime);
+  background: var(--gold-dim);
+  border-color: rgba(212,175,55,0.4);
+  color: var(--gold);
 }
 
 .alphabet-grid {
@@ -488,11 +487,11 @@ html, body {
 .sign-tile::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--lime-dim), transparent);
+  background: linear-gradient(135deg, var(--gold-dim), transparent);
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-.sign-tile:hover { border-color: rgba(200,241,53,0.25); transform: translateY(-2px); }
+.sign-tile:hover { border-color: rgba(212,175,55,0.3); transform: translateY(-2px); }
 .sign-tile:hover::before { opacity: 1; }
 
 .sign-tile.motion {
@@ -504,7 +503,7 @@ html, body {
 .tile-letter {
   display: block;
   font-family: var(--mono); font-size: 38px; font-weight: 700;
-  color: var(--lime); margin-bottom: 8px;
+  color: var(--gold); margin-bottom: 8px;
   position: relative; z-index: 1;
 }
 .tile-desc {
@@ -543,7 +542,7 @@ html, body {
 }
 .flow-num {
   font-family: var(--mono); font-size: 11px; font-weight: 700;
-  color: var(--lime); letter-spacing: 0.1em;
+  color: var(--gold); letter-spacing: 0.1em;
   margin-bottom: 10px;
 }
 .flow-content h3 {
@@ -574,7 +573,7 @@ html, body {
 .credits-block {
   background: var(--ink-2);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--lime);
+  border-left: 3px solid var(--gold);
   border-radius: var(--r);
   padding: 20px 24px;
 }
