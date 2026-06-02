@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Señas — Detector de Lenguaje de Señas</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
+<div class="shell">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <span class="brand-icon">🤟</span>
+      <div>
+        <span class="brand-name">señas</span>
+        <span class="brand-tag">detector</span>
+      </div>
+    </div>
+
+    <nav class="header-nav">
+      <button class="nav-pill active" data-tab="detector">Detector</button>
+      <button class="nav-pill" data-tab="signs">Abecedario</button>
+      <button class="nav-pill" data-tab="about">Info</button>
+    </nav>
+
+    <div class="header-status">
+      <span class="status-indicator" id="statusDot"></span>
+      <span class="status-label" id="statusText">Listo</span>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- TAB: DETECTOR -->
+    <section class="tab active" id="tab-detector">
+
+      <div class="hero-sign-wrap">
+        <div class="hero-sign" id="heroSign">
+          <span class="hero-sign-char" id="heroChar">?</span>
+          <div class="hero-sign-ring"></div>
+          <div class="hero-sign-ring ring-2"></div>
+        </div>
+        <div class="hero-meta">
+          <p class="hero-label">Seña detectada</p>
+          <div class="fps-badge" id="fpsCounter">— FPS</div>
+        </div>
+      </div>
+
+      <div class="detector-layout">
+
+        <!-- Cámara -->
+        <div class="cam-block">
+          <div class="cam-header">
+            <span class="block-label">Cámara en vivo</span>
+            <div class="cam-btns">
+              <button class="btn-start" id="startBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Iniciar
+              </button>
+              <button class="btn-stop hidden" id="stopBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+                Detener
+              </button>
+            </div>
+          </div>
+
+          <div class="cam-frame">
+            <!-- Video oculto: captura getUserMedia -->
+            <video id="videoRaw" class="hidden" autoplay playsinline muted></video>
+            <!-- Canvas oculto: para capturar frames -->
+            <canvas id="captureCanvas" class="hidden"></canvas>
+            <!-- Canvas visible: muestra el frame anotado del servidor -->
+            <canvas id="displayCanvas" class="cam-feed hidden"></canvas>
+
+            <div class="cam-placeholder" id="videoPlaceholder">
+              <div class="cam-placeholder-inner">
+                <div class="cam-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                  </svg>
+                </div>
+                <p>Presiona <strong>Iniciar</strong> para activar la cámara</p>
+                <span class="cam-hint">Se pedirá permiso para usar la cámara</span>
+              </div>
+            </div>
+
+            <div class="cam-corner tl"></div>
+            <div class="cam-corner tr"></div>
+            <div class="cam-corner bl"></div>
+            <div class="cam-corner br"></div>
+          </div>
+        </div>
+
+        <!-- Panel derecho -->
+        <div class="side-panel">
+
+          <div class="panel-block detect-block">
+            <div class="block-header">
+              <span class="block-label">Detectando</span>
+              <span class="live-dot" id="liveDot"></span>
+            </div>
+            <div class="detect-chips" id="detectionDisplay">
+              <span class="no-detect">Sin señas</span>
+            </div>
+          </div>
+
+          <div class="panel-block history-block">
+            <div class="block-header">
+              <span class="block-label">Historial</span>
+              <button class="btn-clear" id="clearHistoryBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Borrar
+              </button>
+            </div>
+            <div class="history-scroll" id="historyList">
+              <div class="history-empty">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <p>El historial aparecerá aquí</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-block word-block">
+            <div class="block-header">
+              <span class="block-label">Palabra</span>
+              <button class="btn-clear" id="clearWordBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                Limpiar
+              </button>
+            </div>
+            <div class="word-display" id="wordDisplay">
+              <span class="word-placeholder">—</span>
+            </div>
+            <button class="btn-add-letter" id="addLetterBtn" disabled>
+              + Agregar letra al texto
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: ABECEDARIO -->
+    <section class="tab" id="tab-signs">
+      <div class="section-header">
+        <h2>Abecedario en Señas</h2>
+        <p>Referencia de todas las señas que el sistema puede reconocer.</p>
+      </div>
+      <div class="alphabet-filter">
+        <button class="filter-btn active" data-filter="all">Todas</button>
+        <button class="filter-btn" data-filter="static">Estáticas</button>
+        <button class="filter-btn" data-filter="motion">Con movimiento</button>
+      </div>
+      <div class="alphabet-grid" id="signsGrid"></div>
+    </section>
+
+    <!-- TAB: INFO -->
+    <section class="tab" id="tab-about">
+      <div class="section-header">
+        <h2>Cómo funciona</h2>
+        <p>Tecnología de visión por computadora aplicada al lenguaje de señas.</p>
+      </div>
+
+      <div class="about-flow">
+        <div class="flow-step">
+          <div class="flow-num">01</div>
+          <div class="flow-content">
+            <h3>Cámara en el navegador</h3>
+            <p>getUserMedia captura video desde tu cámara directamente en el navegador, sin instalar nada.</p>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-num">02</div>
+          <div class="flow-content">
+            <h3>Envío de frames</h3>
+            <p>Cada frame se captura en un canvas, se codifica en JPEG base64 y se envía al servidor Flask.</p>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-num">03</div>
+          <div class="flow-content">
+            <h3>Detección con MediaPipe</h3>
+            <p>El servidor detecta 21 landmarks de la mano y calcula los ángulos de cada dedo para identificar la seña.</p>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-num">04</div>
+          <div class="flow-content">
+            <h3>Respuesta visual</h3>
+            <p>El servidor devuelve el frame anotado con la letra detectada y el navegador lo muestra en pantalla.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-row">
+        <div class="tech-card">
+          <span class="tech-icon">🐍</span>
+          <span class="tech-name">Python</span>
+          <span class="tech-role">Backend</span>
+        </div>
+        <div class="tech-card">
+          <span class="tech-icon">🌶️</span>
+          <span class="tech-name">Flask</span>
+          <span class="tech-role">Servidor web</span>
+        </div>
+        <div class="tech-card">
+          <span class="tech-icon">✋</span>
+          <span class="tech-name">MediaPipe</span>
+          <span class="tech-role">Detección de manos</span>
+        </div>
+        <div class="tech-card">
+          <span class="tech-icon">📷</span>
+          <span class="tech-name">OpenCV</span>
+          <span class="tech-role">Procesamiento de imagen</span>
+        </div>
+      </div>
+
+      <div class="credits-block">
+        <p>La cámara se captura en el navegador con la API nativa <code>getUserMedia</code>, lo que permite que el proyecto funcione desplegado en la nube sin acceso a hardware del servidor.</p>
+        <p class="credits-note">Las letras J y Z requieren movimiento y se detectan por desplazamiento del meñique entre frames.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
