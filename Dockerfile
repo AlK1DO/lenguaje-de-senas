@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --no-deps mediapipe==0.10.14 && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
